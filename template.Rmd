@@ -12,4 +12,68 @@ library(tidyverse)
 ```
 ```{r}
 pols_df = read_csv("./fivethirtyeight_datasets/fivethirtyeight_datasets/pols-month.csv")
+snp_df = read_csv("./fivethirtyeight_datasets/fivethirtyeight_datasets/snp.csv")
+unemployment_df = read_csv("./fivethirtyeight_datasets/fivethirtyeight_datasets/unemployment.csv")
+```
+
+```{r}
+
+separate_pols_df =
+  
+  separate(pols_df, mon, into = c("Year", "month", "day"), sep = "-")
+
+integer_pols_df =
+  mutate(separate_pols_df,
+         Year = strtoi(Year),
+         month = strtoi(month),
+         day = strtoi(day))
+
+month_name_pols_df = 
+  mutate(integer_pols_df, month = month.abb[month])
+
+president_pols_df = mutate(month_name_pols_df, 
+                           president = case_when(
+                             prez_dem == 1 ~ "gop",
+                             prez_gop == 1 ~ "dem"
+                           ))
+
+clean_pols_df = select(president_pols_df, -day, -prez_dem, -prez_gop)
+
+```
+
+```{r}
+separate_snp_df =
+  
+  separate(snp_df, date, into = c("Year", "month", "day"), sep = "-")
+
+integer_snp_df =
+  mutate(separate_snp_df,
+         Year = strtoi(Year),
+         month = strtoi(month),
+         day = strtoi(day))
+
+month_name_snp_df = 
+  mutate(integer_snp_df, month = month.abb[month])
+
+clean_snp_df = select(month_name_snp_df, -day)
+
+arranged_snp_df = arrange(clean_snp_df, Year, month)
+```
+
+```{r}
+pivot_unemployment_df = 
+  pivot_longer(
+    unemployment_df, Jan:Dec, 
+    names_to = "month",
+    values_to = "unemployment_rate"
+  )
+
+clean_unemployment_df = arrange(pivot_unemployment_df, Year, month)
+```
+
+```{r}
+first_merged_df = left_join(clean_pols_df , arranged_snp_df, by = c("Year", "month"))
+final_merged_df = left_join(clean_unemployment_df, first_merged_df, by = c("Year", "month"))
+
+final_merged_df
 ```
