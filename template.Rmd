@@ -1,21 +1,15 @@
 ---
-title: "Simple document"
+title: "Homework 2"
 output: html_document
 ---
 
 I'm an R Markdown document! 
 
-# Section 1
-
-Here's a **code chunk** that samples from 
-a _normal distribution_:
+# Problem 1
 
 ```{r}
-samp = rnorm(100)
-length(samp)
+library(tidyverse)
 ```
-
-# Section 2
-
-I can take the mean of the sample, too!
-The mean is `r mean(samp)`.
+```{r}
+pols_df = read_csv("./fivethirtyeight_datasets/fivethirtyeight_datasets/pols-month.csv")
+```
