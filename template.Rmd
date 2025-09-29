@@ -9,6 +9,7 @@ I'm an R Markdown document!
 
 ```{r}
 library(tidyverse)
+library(readxl)
 ```
 ```{r}
 pols_df = read_csv("./fivethirtyeight_datasets/fivethirtyeight_datasets/pols-month.csv")
@@ -77,3 +78,47 @@ final_merged_df = left_join(clean_unemployment_df, first_merged_df, by = c("Year
 
 final_merged_df
 ```
+
+#problem 2
+
+```{r}
+mr_trash_wheel_df = read_excel("./fivethirtyeight_datasets/202409 Trash Wheel Collection Data.xlsx", sheet = "Mr. Trash Wheel", range = "A2:N655")
+
+mr_trash_wheel_omit_df = drop_na(mr_trash_wheel_df, Dumpster)
+
+almost_mr_trash_wheel_df = mutate(mr_trash_wheel_omit_df, `Sports Balls` = as.integer(round(`Sports Balls`, 0)))
+
+without_name_mr_trash_wheel_df = mutate(almost_mr_trash_wheel_df, Year = as.integer(Year))
+
+clean_mr_trash_wheel_df = mutate(without_name_mr_trash_wheel_df, Sheet = "Mr. Trash Wheel")
+```
+
+```{r}
+professor_trash_wheel_df = read_excel("./fivethirtyeight_datasets/202409 Trash Wheel Collection Data.xlsx", sheet = "Professor Trash Wheel", range = "A2:M123")
+
+professor_trash_wheel_omit_df = drop_na(professor_trash_wheel_df, Dumpster)
+
+without_professor_trash_wheel_df = mutate(professor_trash_wheel_omit_df, Year = as.integer(Year))
+
+clean_professor_trash_wheel_df = mutate(without_professor_trash_wheel_df, Sheet = "Professor Trash Wheel")
+```
+
+```{r}
+Gwynnda_trash_wheel_df = read_excel("./fivethirtyeight_datasets/202409 Trash Wheel Collection Data.xlsx", sheet = "Gwynnda Trash Wheel", range = "A2:L266")
+
+Gwynnda_trash_wheel_omit_df = drop_na(Gwynnda_trash_wheel_df, Dumpster)
+
+without_Gwynnda_trash_wheel_df = mutate(Gwynnda_trash_wheel_omit_df, Year = as.integer(Year))
+
+clean_Gwynnda_trash_wheel_df = mutate(without_Gwynnda_trash_wheel_df, Sheet = "Gwynnda Trash Wheel")
+```
+
+```{r}
+merged_data_trash_wheel_1 = left_join(clean_mr_trash_wheel_df, clean_professor_trash_wheel_df)
+merged_data_trash_wheel_2 = left_join(merged_data_trash_wheel_1, clean_Gwynnda_trash_wheel_df)
+
+merged_data_trash_wheel_final = select(merged_data_trash_wheel_2, Sheet, everything())
+
+merged_data_trash_wheel_final
+```
+

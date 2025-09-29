@@ -367,6 +367,7 @@ display: none;
 ## ✖ dplyr::filter() masks stats::filter()
 ## ✖ dplyr::lag()    masks stats::lag()
 ## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+<pre class="r"><code>library(readxl)</code></pre>
 <pre class="r"><code>pols_df = read_csv(&quot;./fivethirtyeight_datasets/fivethirtyeight_datasets/pols-month.csv&quot;)</code></pre>
 <pre><code>## Rows: 822 Columns: 9
 ## ── Column specification ────────────────────────────────────────────────────────
@@ -457,6 +458,59 @@ final_merged_df</code></pre>
 ## 10  1948 Nov                 3.8      22      53     253      24      48     198
 ## # ℹ 806 more rows
 ## # ℹ 2 more variables: president &lt;chr&gt;, close &lt;dbl&gt;</code></pre>
+<p>#problem 2</p>
+<pre class="r"><code>mr_trash_wheel_df = read_excel(&quot;./fivethirtyeight_datasets/202409 Trash Wheel Collection Data.xlsx&quot;, sheet = &quot;Mr. Trash Wheel&quot;, range = &quot;A2:N655&quot;)
+
+mr_trash_wheel_omit_df = drop_na(mr_trash_wheel_df, Dumpster)
+
+almost_mr_trash_wheel_df = mutate(mr_trash_wheel_omit_df, `Sports Balls` = as.integer(round(`Sports Balls`, 0)))
+
+without_name_mr_trash_wheel_df = mutate(almost_mr_trash_wheel_df, Year = as.integer(Year))
+
+clean_mr_trash_wheel_df = mutate(without_name_mr_trash_wheel_df, Sheet = &quot;Mr. Trash Wheel&quot;)</code></pre>
+<pre class="r"><code>professor_trash_wheel_df = read_excel(&quot;./fivethirtyeight_datasets/202409 Trash Wheel Collection Data.xlsx&quot;, sheet = &quot;Professor Trash Wheel&quot;, range = &quot;A2:M123&quot;)
+
+professor_trash_wheel_omit_df = drop_na(professor_trash_wheel_df, Dumpster)
+
+without_professor_trash_wheel_df = mutate(professor_trash_wheel_omit_df, Year = as.integer(Year))
+
+clean_professor_trash_wheel_df = mutate(without_professor_trash_wheel_df, Sheet = &quot;Professor Trash Wheel&quot;)</code></pre>
+<pre class="r"><code>Gwynnda_trash_wheel_df = read_excel(&quot;./fivethirtyeight_datasets/202409 Trash Wheel Collection Data.xlsx&quot;, sheet = &quot;Gwynnda Trash Wheel&quot;, range = &quot;A2:L266&quot;)
+
+Gwynnda_trash_wheel_omit_df = drop_na(Gwynnda_trash_wheel_df, Dumpster)
+
+without_Gwynnda_trash_wheel_df = mutate(Gwynnda_trash_wheel_omit_df, Year = as.integer(Year))
+
+clean_Gwynnda_trash_wheel_df = mutate(without_Gwynnda_trash_wheel_df, Sheet = &quot;Gwynnda Trash Wheel&quot;)</code></pre>
+<pre class="r"><code>merged_data_trash_wheel_1 = left_join(clean_mr_trash_wheel_df, clean_professor_trash_wheel_df)</code></pre>
+<pre><code>## Joining with `by = join_by(Dumpster, Month, Year, Date, `Weight (tons)`,
+## `Volume (cubic yards)`, `Plastic Bottles`, Polystyrene, `Cigarette Butts`,
+## `Glass Bottles`, `Plastic Bags`, Wrappers, `Homes Powered*`, Sheet)`</code></pre>
+<pre class="r"><code>merged_data_trash_wheel_2 = left_join(merged_data_trash_wheel_1, clean_Gwynnda_trash_wheel_df)</code></pre>
+<pre><code>## Joining with `by = join_by(Dumpster, Month, Year, Date, `Weight (tons)`,
+## `Volume (cubic yards)`, `Plastic Bottles`, Polystyrene, `Cigarette Butts`,
+## `Plastic Bags`, Wrappers, `Homes Powered*`, Sheet)`</code></pre>
+<pre class="r"><code>merged_data_trash_wheel_final = select(merged_data_trash_wheel_2, Sheet, everything())
+
+merged_data_trash_wheel_final</code></pre>
+<pre><code>## # A tibble: 651 × 15
+##    Sheet           Dumpster Month  Year Date                `Weight (tons)`
+##    &lt;chr&gt;              &lt;dbl&gt; &lt;chr&gt; &lt;int&gt; &lt;dttm&gt;                        &lt;dbl&gt;
+##  1 Mr. Trash Wheel        1 May    2014 2014-05-16 00:00:00            4.31
+##  2 Mr. Trash Wheel        2 May    2014 2014-05-16 00:00:00            2.74
+##  3 Mr. Trash Wheel        3 May    2014 2014-05-16 00:00:00            3.45
+##  4 Mr. Trash Wheel        4 May    2014 2014-05-17 00:00:00            3.1 
+##  5 Mr. Trash Wheel        5 May    2014 2014-05-17 00:00:00            4.06
+##  6 Mr. Trash Wheel        6 May    2014 2014-05-20 00:00:00            2.71
+##  7 Mr. Trash Wheel        7 May    2014 2014-05-21 00:00:00            1.91
+##  8 Mr. Trash Wheel        8 May    2014 2014-05-28 00:00:00            3.7 
+##  9 Mr. Trash Wheel        9 June   2014 2014-06-05 00:00:00            2.52
+## 10 Mr. Trash Wheel       10 June   2014 2014-06-11 00:00:00            3.76
+## # ℹ 641 more rows
+## # ℹ 9 more variables: `Volume (cubic yards)` &lt;dbl&gt;, `Plastic Bottles` &lt;dbl&gt;,
+## #   Polystyrene &lt;dbl&gt;, `Cigarette Butts` &lt;dbl&gt;, `Glass Bottles` &lt;dbl&gt;,
+## #   `Plastic Bags` &lt;dbl&gt;, Wrappers &lt;dbl&gt;, `Sports Balls` &lt;int&gt;,
+## #   `Homes Powered*` &lt;dbl&gt;</code></pre>
 </div>
 
 
