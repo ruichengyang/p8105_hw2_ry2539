@@ -100,7 +100,7 @@ professor_trash_wheel_omit_df = drop_na(professor_trash_wheel_df, Dumpster)
 
 without_professor_trash_wheel_df = mutate(professor_trash_wheel_omit_df, Year = as.integer(Year))
 
-clean_professor_trash_wheel_df = mutate(without_professor_trash_wheel_df, Sheet = "Professor Trash Wheel")
+clean_professor_trash_wheel_df = mutate(without_professor_trash_wheel_df, Sheet = "Professor Trash Wheel", `Sports Balls` = NA)
 ```
 
 ```{r}
@@ -110,14 +110,13 @@ Gwynnda_trash_wheel_omit_df = drop_na(Gwynnda_trash_wheel_df, Dumpster)
 
 without_Gwynnda_trash_wheel_df = mutate(Gwynnda_trash_wheel_omit_df, Year = as.integer(Year))
 
-clean_Gwynnda_trash_wheel_df = mutate(without_Gwynnda_trash_wheel_df, Sheet = "Gwynnda Trash Wheel")
+clean_Gwynnda_trash_wheel_df = mutate(without_Gwynnda_trash_wheel_df, Sheet = "Gwynnda Trash Wheel", `Sports Balls` = NA, `Glass Balls` = NA)
 ```
 
 ```{r}
-merged_data_trash_wheel_1 = left_join(clean_mr_trash_wheel_df, clean_professor_trash_wheel_df)
-merged_data_trash_wheel_2 = left_join(merged_data_trash_wheel_1, clean_Gwynnda_trash_wheel_df)
+merged_data_trash_wheel_1 = bind_rows(clean_mr_trash_wheel_df, clean_professor_trash_wheel_df, clean_Gwynnda_trash_wheel_df)
 
-merged_data_trash_wheel_final = select(merged_data_trash_wheel_2, Sheet, everything())
+merged_data_trash_wheel_final = select(merged_data_trash_wheel_1, Sheet, everything())
 
 merged_data_trash_wheel_final
 ```

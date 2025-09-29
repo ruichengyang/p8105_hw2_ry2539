@@ -474,26 +474,20 @@ professor_trash_wheel_omit_df = drop_na(professor_trash_wheel_df, Dumpster)
 
 without_professor_trash_wheel_df = mutate(professor_trash_wheel_omit_df, Year = as.integer(Year))
 
-clean_professor_trash_wheel_df = mutate(without_professor_trash_wheel_df, Sheet = &quot;Professor Trash Wheel&quot;)</code></pre>
+clean_professor_trash_wheel_df = mutate(without_professor_trash_wheel_df, Sheet = &quot;Professor Trash Wheel&quot;, `Sports Balls` = NA)</code></pre>
 <pre class="r"><code>Gwynnda_trash_wheel_df = read_excel(&quot;./fivethirtyeight_datasets/202409 Trash Wheel Collection Data.xlsx&quot;, sheet = &quot;Gwynnda Trash Wheel&quot;, range = &quot;A2:L266&quot;)
 
 Gwynnda_trash_wheel_omit_df = drop_na(Gwynnda_trash_wheel_df, Dumpster)
 
 without_Gwynnda_trash_wheel_df = mutate(Gwynnda_trash_wheel_omit_df, Year = as.integer(Year))
 
-clean_Gwynnda_trash_wheel_df = mutate(without_Gwynnda_trash_wheel_df, Sheet = &quot;Gwynnda Trash Wheel&quot;)</code></pre>
-<pre class="r"><code>merged_data_trash_wheel_1 = left_join(clean_mr_trash_wheel_df, clean_professor_trash_wheel_df)</code></pre>
-<pre><code>## Joining with `by = join_by(Dumpster, Month, Year, Date, `Weight (tons)`,
-## `Volume (cubic yards)`, `Plastic Bottles`, Polystyrene, `Cigarette Butts`,
-## `Glass Bottles`, `Plastic Bags`, Wrappers, `Homes Powered*`, Sheet)`</code></pre>
-<pre class="r"><code>merged_data_trash_wheel_2 = left_join(merged_data_trash_wheel_1, clean_Gwynnda_trash_wheel_df)</code></pre>
-<pre><code>## Joining with `by = join_by(Dumpster, Month, Year, Date, `Weight (tons)`,
-## `Volume (cubic yards)`, `Plastic Bottles`, Polystyrene, `Cigarette Butts`,
-## `Plastic Bags`, Wrappers, `Homes Powered*`, Sheet)`</code></pre>
-<pre class="r"><code>merged_data_trash_wheel_final = select(merged_data_trash_wheel_2, Sheet, everything())
+clean_Gwynnda_trash_wheel_df = mutate(without_Gwynnda_trash_wheel_df, Sheet = &quot;Gwynnda Trash Wheel&quot;, `Sports Balls` = NA, `Glass Balls` = NA)</code></pre>
+<pre class="r"><code>merged_data_trash_wheel_1 = bind_rows(clean_mr_trash_wheel_df, clean_professor_trash_wheel_df, clean_Gwynnda_trash_wheel_df)
+
+merged_data_trash_wheel_final = select(merged_data_trash_wheel_1, Sheet, everything())
 
 merged_data_trash_wheel_final</code></pre>
-<pre><code>## # A tibble: 651 × 15
+<pre><code>## # A tibble: 1,033 × 16
 ##    Sheet           Dumpster Month  Year Date                `Weight (tons)`
 ##    &lt;chr&gt;              &lt;dbl&gt; &lt;chr&gt; &lt;int&gt; &lt;dttm&gt;                        &lt;dbl&gt;
 ##  1 Mr. Trash Wheel        1 May    2014 2014-05-16 00:00:00            4.31
@@ -506,11 +500,11 @@ merged_data_trash_wheel_final</code></pre>
 ##  8 Mr. Trash Wheel        8 May    2014 2014-05-28 00:00:00            3.7 
 ##  9 Mr. Trash Wheel        9 June   2014 2014-06-05 00:00:00            2.52
 ## 10 Mr. Trash Wheel       10 June   2014 2014-06-11 00:00:00            3.76
-## # ℹ 641 more rows
-## # ℹ 9 more variables: `Volume (cubic yards)` &lt;dbl&gt;, `Plastic Bottles` &lt;dbl&gt;,
+## # ℹ 1,023 more rows
+## # ℹ 10 more variables: `Volume (cubic yards)` &lt;dbl&gt;, `Plastic Bottles` &lt;dbl&gt;,
 ## #   Polystyrene &lt;dbl&gt;, `Cigarette Butts` &lt;dbl&gt;, `Glass Bottles` &lt;dbl&gt;,
 ## #   `Plastic Bags` &lt;dbl&gt;, Wrappers &lt;dbl&gt;, `Sports Balls` &lt;int&gt;,
-## #   `Homes Powered*` &lt;dbl&gt;</code></pre>
+## #   `Homes Powered*` &lt;dbl&gt;, `Glass Balls` &lt;lgl&gt;</code></pre>
 </div>
 
 
