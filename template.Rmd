@@ -110,7 +110,7 @@ Gwynnda_trash_wheel_omit_df = drop_na(Gwynnda_trash_wheel_df, Dumpster)
 
 without_Gwynnda_trash_wheel_df = mutate(Gwynnda_trash_wheel_omit_df, Year = as.integer(Year))
 
-clean_Gwynnda_trash_wheel_df = mutate(without_Gwynnda_trash_wheel_df, Sheet = "Gwynnda Trash Wheel", `Sports Balls` = NA, `Glass Balls` = NA)
+clean_Gwynnda_trash_wheel_df = mutate(without_Gwynnda_trash_wheel_df, Sheet = "Gwynnda Trash Wheel", `Sports Balls` = NA, `Glass Bottles` = NA)
 ```
 
 ```{r}
