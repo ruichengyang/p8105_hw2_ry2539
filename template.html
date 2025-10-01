@@ -353,7 +353,7 @@ display: none;
 </div>
 
 
-<p>I’m an R Markdown document!</p>
+<p>Ruicheng Yang, ry2539, p8105</p>
 <div id="problem-1" class="section level1">
 <h1>Problem 1</h1>
 <pre class="r"><code>library(tidyverse)</code></pre>
@@ -368,7 +368,9 @@ display: none;
 ## ✖ dplyr::lag()    masks stats::lag()
 ## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
 <pre class="r"><code>library(readxl)</code></pre>
-<pre class="r"><code>pols_df = read_csv(&quot;./fivethirtyeight_datasets/fivethirtyeight_datasets/pols-month.csv&quot;)</code></pre>
+<pre class="r"><code>#read dataframes using csv funtion#
+
+pols_df = read_csv(&quot;./fivethirtyeight_datasets/fivethirtyeight_datasets/pols-month.csv&quot;)</code></pre>
 <pre><code>## Rows: 822 Columns: 9
 ## ── Column specification ────────────────────────────────────────────────────────
 ## Delimiter: &quot;,&quot;
@@ -394,9 +396,13 @@ display: none;
 ## 
 ## ℹ Use `spec()` to retrieve the full column specification for this data.
 ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-<pre class="r"><code>separate_pols_df =
+<pre class="r"><code>#separate mon variabe in dataframe into year, month, day#
+
+separate_pols_df =
   
   separate(pols_df, mon, into = c(&quot;Year&quot;, &quot;month&quot;, &quot;day&quot;), sep = &quot;-&quot;)
+
+#change variables above into integer variables#
 
 integer_pols_df =
   mutate(separate_pols_df,
@@ -404,8 +410,12 @@ integer_pols_df =
          month = strtoi(month),
          day = strtoi(day))
 
+#Turn month values 1, 2, 3,... to january, february, march, etc.#
+
 month_name_pols_df = 
   mutate(integer_pols_df, month = month.abb[month])
+
+#Create the president variable#
 
 president_pols_df = mutate(month_name_pols_df, 
                            president = case_when(
@@ -413,29 +423,44 @@ president_pols_df = mutate(month_name_pols_df,
                              prez_gop == 1 ~ &quot;dem&quot;
                            ))
 
+#Remove the unnecessary variables day, prezdem, prezgop#
+
 clean_pols_df = select(president_pols_df, -day, -prez_dem, -prez_gop)</code></pre>
-<pre class="r"><code>separate_snp_df =
+<pre class="r"><code>#separate mon variable in dataframe into year, month, day#
+
+separate_snp_df =
   
   separate(snp_df, date, into = c(&quot;month&quot;, &quot;day&quot;, &quot;year&quot;), sep = &quot;/&quot;)
+
+#change variables above into integer variables#
 
 integer_snp_df =
   mutate(separate_snp_df,
          month = strtoi(month),
          day = strtoi(day))
 
+#Turn month values 1, 2, 3,... to january, february, march, etc.#
+
 month_name_snp_df = 
   mutate(integer_snp_df, month = month.abb[month])
+
+#Turn the years 15, 16, 50, to years 2015, 2016, 1950, etc.#
 
 year_name_snp_df = mutate(month_name_snp_df, Year = case_when(
   year &lt;= 15 ~ paste0(&quot;20&quot;, year),
   year &gt;= 50 ~ paste0(&quot;19&quot;, year)
 ))
 
+#remove the day and original year variable since now we have the Year variable#
+
 clean_snp_df = select(year_name_snp_df, -day, -year)
 
+#Make sure Year and month are leading variables and change the Year variable into an integer variable#
 string_to_integer_snp_df = mutate(clean_snp_df, Year = strtoi(Year))
 arranged_snp_df = select(string_to_integer_snp_df, Year, month, close)</code></pre>
-<pre class="r"><code>pivot_unemployment_df = 
+<pre class="r"><code>#pivot the dataframe into a longer form, with Year, Month, and unemployment rate as our three columns#
+
+pivot_unemployment_df = 
   pivot_longer(
     unemployment_df, Jan:Dec, 
     names_to = &quot;month&quot;,
@@ -443,7 +468,9 @@ arranged_snp_df = select(string_to_integer_snp_df, Year, month, close)</code></p
   )
 
 clean_unemployment_df = arrange(pivot_unemployment_df, Year, month)</code></pre>
-<pre class="r"><code>first_merged_df = left_join(clean_pols_df , arranged_snp_df, by = c(&quot;Year&quot;, &quot;month&quot;))
+<pre class="r"><code>#Firs left_join snp dataframe and clean_pols dataframe, then merge that dataframe with unemployment dataframe#
+
+first_merged_df = left_join(clean_pols_df , arranged_snp_df, by = c(&quot;Year&quot;, &quot;month&quot;))
 final_merged_df = left_join(clean_unemployment_df, first_merged_df, by = c(&quot;Year&quot;, &quot;month&quot;))
 
 final_merged_df</code></pre>
@@ -475,30 +502,60 @@ democrat.</p>
 </div>
 <div id="problem-2" class="section level1">
 <h1>Problem 2</h1>
-<pre class="r"><code>mr_trash_wheel_df = read_excel(&quot;./fivethirtyeight_datasets/202509 Trash Wheel Collection Data.xlsx&quot;, sheet = &quot;Mr. Trash Wheel&quot;, range = &quot;A2:N710&quot;)
+<pre class="r"><code>#Read the excel datafiles using read_excel#
+
+mr_trash_wheel_df = read_excel(&quot;./fivethirtyeight_datasets/202509 Trash Wheel Collection Data.xlsx&quot;, sheet = &quot;Mr. Trash Wheel&quot;, range = &quot;A2:N710&quot;)
+
+#Omit the rows without a dumpster value#
 
 mr_trash_wheel_omit_df = drop_na(mr_trash_wheel_df, Dumpster)
 
+#Change the sports balls data into an integer variable and round it#
+
 almost_mr_trash_wheel_df = mutate(mr_trash_wheel_omit_df, `Sports Balls` = as.integer(round(`Sports Balls`, 0)))
+
+#Change variable of Year to an integer so that we can merge the data sheets#
 
 without_name_mr_trash_wheel_df = mutate(almost_mr_trash_wheel_df, Year = as.integer(Year))
 
+#Add a new variable Sheet and assign the variable as &quot;Mr. Trash Wheel&quot;#
+
 clean_mr_trash_wheel_df = mutate(without_name_mr_trash_wheel_df, Sheet = &quot;Mr. Trash Wheel&quot;)</code></pre>
-<pre class="r"><code>professor_trash_wheel_df = read_excel(&quot;./fivethirtyeight_datasets/202509 Trash Wheel Collection Data.xlsx&quot;, sheet = &quot;Professor Trash Wheel&quot;, range = &quot;A2:M135&quot;)
+<pre class="r"><code>#Read the excel datafiles using read_excel#
+
+professor_trash_wheel_df = read_excel(&quot;./fivethirtyeight_datasets/202509 Trash Wheel Collection Data.xlsx&quot;, sheet = &quot;Professor Trash Wheel&quot;, range = &quot;A2:M135&quot;)
+
+#Omit the rows without a dumpster value#
 
 professor_trash_wheel_omit_df = drop_na(professor_trash_wheel_df, Dumpster)
 
+#Change variable of Year to an integer so that we can merge the data sheets#
+
 without_professor_trash_wheel_df = mutate(professor_trash_wheel_omit_df, Year = as.integer(Year))
 
+#Add a new variable Sheet and assign the variable as &quot;Professor Trash Wheel&quot;#
+
 clean_professor_trash_wheel_df = mutate(without_professor_trash_wheel_df, Sheet = &quot;Professor Trash Wheel&quot;, `Sports Balls` = NA)</code></pre>
-<pre class="r"><code>Gwynnda_trash_wheel_df = read_excel(&quot;./fivethirtyeight_datasets/202509 Trash Wheel Collection Data.xlsx&quot;, sheet = &quot;Gwynns Falls Trash Wheel&quot;, range = &quot;A2:L352&quot;)
+<pre class="r"><code>#Read the excel datafiles using read_excel#
+
+Gwynnda_trash_wheel_df = read_excel(&quot;./fivethirtyeight_datasets/202509 Trash Wheel Collection Data.xlsx&quot;, sheet = &quot;Gwynns Falls Trash Wheel&quot;, range = &quot;A2:L352&quot;)
+
+#Omit the rows without a dumpster value#
 
 Gwynnda_trash_wheel_omit_df = drop_na(Gwynnda_trash_wheel_df, Dumpster)
 
+#Change variable of Year to an integer so that we can merge the data sheets#
+
 without_Gwynnda_trash_wheel_df = mutate(Gwynnda_trash_wheel_omit_df, Year = as.integer(Year))
 
+#Add a new variable Sheet and assign the variable as &quot;Professor Trash Wheel&quot;#
+
 clean_Gwynnda_trash_wheel_df = mutate(without_Gwynnda_trash_wheel_df, Sheet = &quot;Gwynns Falls Trash Wheel&quot;, `Sports Balls` = NA, `Glass Bottles` = NA)</code></pre>
-<pre class="r"><code>merged_data_trash_wheel_1 = bind_rows(clean_mr_trash_wheel_df, clean_professor_trash_wheel_df, clean_Gwynnda_trash_wheel_df)
+<pre class="r"><code>#Use bind rows to observe all the data points from all 3 sheets#
+
+merged_data_trash_wheel_1 = bind_rows(clean_mr_trash_wheel_df, clean_professor_trash_wheel_df, clean_Gwynnda_trash_wheel_df)
+
+#Make sure to put sheet first as a variable so we know which sheet each observation comes from#
 
 merged_data_trash_wheel_final = select(merged_data_trash_wheel_1, Sheet, everything())
 
@@ -540,7 +597,9 @@ to July 2025, a total of 2283.84 tons of trash was collected and about
 </div>
 <div id="problem-3" class="section level1">
 <h1>Problem 3</h1>
-<pre class="r"><code>zillow_price_df = read_csv(&quot;./zillow_data/Zip_zori_uc_sfrcondomfr_sm_month_NYC.csv&quot;)</code></pre>
+<pre class="r"><code>#Read the zillow rental price data file#
+
+zillow_price_df = read_csv(&quot;./zillow_data/Zip_zori_uc_sfrcondomfr_sm_month_NYC.csv&quot;)</code></pre>
 <pre><code>## Rows: 149 Columns: 125
 ## ── Column specification ────────────────────────────────────────────────────────
 ## Delimiter: &quot;,&quot;
@@ -549,9 +608,16 @@ to July 2025, a total of 2283.84 tons of trash was collected and about
 ## 
 ## ℹ Use `spec()` to retrieve the full column specification for this data.
 ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-<pre class="r"><code>zillow_price_zip_variation_df = mutate(zillow_price_df, ZipCode = RegionName)
+<pre class="r"><code>#Have a new data variable as ZipCode from the regionname variable#
+
+zillow_price_zip_variation_df = mutate(zillow_price_df, ZipCode = RegionName)
+
+#Clean the data and eliminate StateName, RegionName, RegionType, which are unnecessary data variables#
+
 zillow_clean_price_df = select(zillow_price_zip_variation_df, -`StateName`, -RegionName, -RegionType)</code></pre>
-<pre class="r"><code>zillow_df = read_csv(&quot;./zillow_data/Zip Codes.csv&quot;)</code></pre>
+<pre class="r"><code>#Read the zillow properties data file#
+
+zillow_df = read_csv(&quot;./zillow_data/Zip Codes.csv&quot;)</code></pre>
 <pre><code>## Rows: 322 Columns: 7
 ## ── Column specification ────────────────────────────────────────────────────────
 ## Delimiter: &quot;,&quot;
@@ -560,11 +626,20 @@ zillow_clean_price_df = select(zillow_price_zip_variation_df, -`StateName`, -Reg
 ## 
 ## ℹ Use `spec()` to retrieve the full column specification for this data.
 ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-<pre class="r"><code>zillow_county_variation_df = mutate(zillow_df, CountyName = paste(County, &quot;County&quot;))
+<pre class="r"><code>#Mutate the CountyName variable from &quot;Bronx&quot; to &quot;Bronx County&quot;#
+
+zillow_county_variation_df = mutate(zillow_df, CountyName = paste(County, &quot;County&quot;))
+
+#Eliminate varibles such as State FIPS, County FIPS, and County#
+
 zillow_clean_df = select(zillow_county_variation_df, -`State FIPS`, -`County FIPS`, -County)</code></pre>
-<pre class="r"><code>first_single_zillow_df = left_join(zillow_clean_df, zillow_clean_price_df)</code></pre>
+<pre class="r"><code>#Merge the two datasets into a single tidy dataset#
+
+first_single_zillow_df = left_join(zillow_clean_df, zillow_clean_price_df)</code></pre>
 <pre><code>## Joining with `by = join_by(ZipCode, CountyName)`</code></pre>
 <pre class="r"><code>first_clean_single_zillow_df = arrange(first_single_zillow_df, RegionID)
+
+#Count the unique zip codes and neighborhoods present in this dataset#
 
 unique_zip_codes = length(unique(first_clean_single_zillow_df$ZipCode))
 unique_neighborhoods = length(unique(first_clean_single_zillow_df$Neighborhood))
@@ -594,11 +669,20 @@ print(unique_zip_codes)</code></pre>
 ## #   `2015-07-31` &lt;dbl&gt;, `2015-08-31` &lt;dbl&gt;, `2015-09-30` &lt;dbl&gt;,
 ## #   `2015-10-31` &lt;dbl&gt;, `2015-11-30` &lt;dbl&gt;, `2015-12-31` &lt;dbl&gt;,
 ## #   `2016-01-31` &lt;dbl&gt;, `2016-02-29` &lt;dbl&gt;, `2016-03-31` &lt;dbl&gt;, …</code></pre>
-<pre class="r"><code>single_zillow_df = left_join(zillow_clean_price_df, zillow_clean_df)</code></pre>
+<pre class="r"><code>#Merge the two dataframes by only keeping the zip codes in the rental price dataframe#
+
+single_zillow_df = left_join(zillow_clean_price_df, zillow_clean_df)</code></pre>
 <pre><code>## Joining with `by = join_by(CountyName, ZipCode)`</code></pre>
-<pre class="r"><code>rental_price_zillow_df = mutate(single_zillow_df, `Rental Difference 2021 vs 2020` = `2021-01-31` - `2020-01-31`)
+<pre class="r"><code>#Include a new variable with rental difference between 2021 vs 2020#
+
+rental_price_zillow_df = mutate(single_zillow_df, `Rental Difference 2021 vs 2020` = `2021-01-31` - `2020-01-31`)
+
+#Rank the rows of the single dataframe according to the rental differences#
 
 clean_zillow_single_df = arrange(rental_price_zillow_df, `Rental Difference 2021 vs 2020`)
+
+#Visualize an arranged dataframe#
+
 arranged_zillow_df = select(clean_zillow_single_df, `RegionID`, SizeRank, ZipCode, State, City, CountyName, `County Code`, Neighborhood, Metro, `Rental Difference 2021 vs 2020`, `2020-01-31`, `2021-01-31`)
 
 arranged_zillow_df</code></pre>
@@ -618,8 +702,12 @@ arranged_zillow_df</code></pre>
 ## # ℹ 139 more rows
 ## # ℹ 4 more variables: Metro &lt;chr&gt;, `Rental Difference 2021 vs 2020` &lt;dbl&gt;,
 ## #   `2020-01-31` &lt;dbl&gt;, `2021-01-31` &lt;dbl&gt;</code></pre>
-<pre class="r"><code>dataframe_price_drop = select(arranged_zillow_df, ZipCode,Neighborhood, `Rental Difference 2021 vs 2020`)
+<pre class="r"><code>#Arrange dataframe with zipcode, neighborhood, and rental difference as leading columns, then slice off the dataframe and create a table with top 10 biggest drops#
+
+dataframe_price_drop = select(arranged_zillow_df, ZipCode,Neighborhood, `Rental Difference 2021 vs 2020`)
 price_drop_table = slice_head(dataframe_price_drop, n= 10)
+
+
 print(price_drop_table)</code></pre>
 <pre><code>## # A tibble: 10 × 3
 ##    ZipCode Neighborhood                  `Rental Difference 2021 vs 2020`
