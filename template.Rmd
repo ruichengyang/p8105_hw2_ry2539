@@ -82,7 +82,7 @@ final_merged_df
 #problem 2
 
 ```{r}
-mr_trash_wheel_df = read_excel("./fivethirtyeight_datasets/202409 Trash Wheel Collection Data.xlsx", sheet = "Mr. Trash Wheel", range = "A2:N655")
+mr_trash_wheel_df = read_excel("./fivethirtyeight_datasets/202509 Trash Wheel Collection Data.xlsx", sheet = "Mr. Trash Wheel", range = "A2:N710")
 
 mr_trash_wheel_omit_df = drop_na(mr_trash_wheel_df, Dumpster)
 
@@ -94,7 +94,7 @@ clean_mr_trash_wheel_df = mutate(without_name_mr_trash_wheel_df, Sheet = "Mr. Tr
 ```
 
 ```{r}
-professor_trash_wheel_df = read_excel("./fivethirtyeight_datasets/202409 Trash Wheel Collection Data.xlsx", sheet = "Professor Trash Wheel", range = "A2:M123")
+professor_trash_wheel_df = read_excel("./fivethirtyeight_datasets/202509 Trash Wheel Collection Data.xlsx", sheet = "Professor Trash Wheel", range = "A2:M135")
 
 professor_trash_wheel_omit_df = drop_na(professor_trash_wheel_df, Dumpster)
 
@@ -104,13 +104,13 @@ clean_professor_trash_wheel_df = mutate(without_professor_trash_wheel_df, Sheet 
 ```
 
 ```{r}
-Gwynnda_trash_wheel_df = read_excel("./fivethirtyeight_datasets/202409 Trash Wheel Collection Data.xlsx", sheet = "Gwynnda Trash Wheel", range = "A2:L266")
+Gwynnda_trash_wheel_df = read_excel("./fivethirtyeight_datasets/202509 Trash Wheel Collection Data.xlsx", sheet = "Gwynns Falls Trash Wheel", range = "A2:L352")
 
 Gwynnda_trash_wheel_omit_df = drop_na(Gwynnda_trash_wheel_df, Dumpster)
 
 without_Gwynnda_trash_wheel_df = mutate(Gwynnda_trash_wheel_omit_df, Year = as.integer(Year))
 
-clean_Gwynnda_trash_wheel_df = mutate(without_Gwynnda_trash_wheel_df, Sheet = "Gwynnda Trash Wheel", `Sports Balls` = NA, `Glass Bottles` = NA)
+clean_Gwynnda_trash_wheel_df = mutate(without_Gwynnda_trash_wheel_df, Sheet = "Gwynns Falls Trash Wheel", `Sports Balls` = NA, `Glass Bottles` = NA)
 ```
 
 ```{r}
@@ -121,3 +121,47 @@ merged_data_trash_wheel_final = select(merged_data_trash_wheel_1, Sheet, everyth
 merged_data_trash_wheel_final
 ```
 
+# Problem 3
+
+```{r}
+zillow_price_df = read_csv("./zillow_data/Zip_zori_uc_sfrcondomfr_sm_month_NYC.csv")
+zillow_price_zip_variation_df = mutate(zillow_price_df, ZipCode = RegionName)
+zillow_clean_price_df = select(zillow_price_zip_variation_df, -`StateName`, -RegionName, -RegionType)
+
+zillow_clean_price_df
+```
+
+```{r}
+zillow_df = read_csv("./zillow_data/Zip Codes.csv")
+zillow_county_variation_df = mutate(zillow_df, CountyName = paste(County, "County"))
+zillow_clean_df = select(zillow_county_variation_df, -`State FIPS`, -`County FIPS`, -County)
+zillow_clean_df
+```
+
+```{r}
+first_single_zillow_df = left_join(zillow_clean_df, zillow_clean_price_2_df)
+first_clean_single_zillow_df = arrange(first_single_zillow_df, RegionID)
+
+unique_zip_codes = length(unique(first_clean_single_zillow_df$ZipCode))
+unique_neighborhoods = length(unique(first_clean_single_zillow_df$Neighborhood))
+
+print(unique_zip_codes)
+print(unique_neighborhoods)
+
+first_clean_single_zillow_df
+
+```
+
+```{r}
+single_zillow_df = left_join(zillow_clean_price_df, zillow_clean_df)
+rental_price_zillow_df = mutate(single_zillow_df, `Rental Difference 2021 vs 2020` = `2021-01-31` - `2020-01-31`)
+
+clean_zillow_single_df = arrange(rental_price_zillow_df, `Rental Difference 2021 vs 2020`)
+arranged_zillow_df = select(clean_zillow_single_df, `RegionID`, SizeRank, ZipCode, State, City, CountyName, `County Code`, Neighborhood, Metro, `Rental Difference 2021 vs 2020`, `2020-01-31`, `2021-01-31`)
+
+arranged_zillow_df
+
+dataframe_price_drop = select(arranged_zillow_df, ZipCode,Neighborhood, `Rental Difference 2021 vs 2020`)
+price_drop_table = slice_head(dataframe_price_drop, n= 10)
+print(price_drop_table)
+```
