@@ -45,20 +45,26 @@ clean_pols_df = select(president_pols_df, -day, -prez_dem, -prez_gop)
 ```{r}
 separate_snp_df =
   
-  separate(snp_df, date, into = c("Year", "month", "day"), sep = "-")
+  separate(snp_df, date, into = c("month", "day", "year"), sep = "/")
 
 integer_snp_df =
   mutate(separate_snp_df,
-         Year = strtoi(Year),
          month = strtoi(month),
          day = strtoi(day))
 
 month_name_snp_df = 
   mutate(integer_snp_df, month = month.abb[month])
 
-clean_snp_df = select(month_name_snp_df, -day)
+year_name_snp_df = mutate(month_name_snp_df, Year = case_when(
+  year <= 15 ~ paste0("20", year),
+  year >= 50 ~ paste0("19", year)
+))
 
-arranged_snp_df = arrange(clean_snp_df, Year, month)
+clean_snp_df = select(year_name_snp_df, -day, -year)
+
+string_to_integer_snp_df = mutate(clean_snp_df, Year = strtoi(Year))
+arranged_snp_df = select(string_to_integer_snp_df, Year, month, close)
+
 ```
 
 ```{r}
@@ -79,7 +85,9 @@ final_merged_df = left_join(clean_unemployment_df, first_merged_df, by = c("Year
 final_merged_df
 ```
 
-#problem 2
+The pols data frame shows the number of republican and democrat candidates in the president, governor, senator, and representative positions for each year from 1948 to 2015. The snp data frame shows the close price of the S&P 500 for each given date from 1950 to 2015. Finally, the unemployment data frame tells us the unemployment rate for each month from 1948 to 2015. The final data set has 816 rows and 11 columns. The years range from 1948 to 2015. Some of the key variables include the unemployment rate, the year and month, the S&P close price, and whether the president at said time was a republican or democrat.
+
+# Problem 2
 
 ```{r}
 mr_trash_wheel_df = read_excel("./fivethirtyeight_datasets/202509 Trash Wheel Collection Data.xlsx", sheet = "Mr. Trash Wheel", range = "A2:N710")
@@ -121,25 +129,28 @@ merged_data_trash_wheel_final = select(merged_data_trash_wheel_1, Sheet, everyth
 merged_data_trash_wheel_final
 ```
 
+In total, we have 1,188 observations from Mr. Trash Wheel, Professor Trash Wheel, and Gwynnda Trash Wheel. It is important to note that Mr. Trash Wheel has much more dumpsters observed than the other two data frames. It is also notable that Gwynnda lacks data on glass bottles and sports balls, while Professor Trash Wheel lacks data on sports balls altogether. Regardless, we can still examine the total weight of trash collected for both data sets.
+
+For example, in the July of 2023, Gwynnda Trash Wheel has collected a total of 20.02 tons of trash from dumpster 155 to 160. Meanwhile, in the month of september of 2023, Professor Trash Wheel collected a total of 4.14 tons of trash from 2 dumpsters. As a subset of this data, these two dumptsers collected 25 cubic yards of said trash. 
+
+Other variables like sports balls and homes powered are also included in the dataset. For Mr. Trash Wheel, across all dumpsters from May 2014 to July 2025, a total of 2283.84 tons of trash was collected and about 30,020 homes were powered.
+
 # Problem 3
 
 ```{r}
 zillow_price_df = read_csv("./zillow_data/Zip_zori_uc_sfrcondomfr_sm_month_NYC.csv")
 zillow_price_zip_variation_df = mutate(zillow_price_df, ZipCode = RegionName)
 zillow_clean_price_df = select(zillow_price_zip_variation_df, -`StateName`, -RegionName, -RegionType)
-
-zillow_clean_price_df
 ```
 
 ```{r}
 zillow_df = read_csv("./zillow_data/Zip Codes.csv")
 zillow_county_variation_df = mutate(zillow_df, CountyName = paste(County, "County"))
 zillow_clean_df = select(zillow_county_variation_df, -`State FIPS`, -`County FIPS`, -County)
-zillow_clean_df
 ```
 
 ```{r}
-first_single_zillow_df = left_join(zillow_clean_df, zillow_clean_price_2_df)
+first_single_zillow_df = left_join(zillow_clean_df, zillow_clean_price_df)
 first_clean_single_zillow_df = arrange(first_single_zillow_df, RegionID)
 
 unique_zip_codes = length(unique(first_clean_single_zillow_df$ZipCode))
@@ -165,3 +176,10 @@ dataframe_price_drop = select(arranged_zillow_df, ZipCode,Neighborhood, `Rental 
 price_drop_table = slice_head(dataframe_price_drop, n= 10)
 print(price_drop_table)
 ```
+
+
+There are a total of 322 observations after our single tidy data set. Overall, there are 320 unique zip codes in total and 43 unique neighborhoods. However, when we are trying to see how many zip codes were excluded from the rental price data, we see that most of the properties excluded are located in New York County, a.k.a. Manhattan. 
+
+Seeing that these properties are in Manhattan, they may have been excluded because these properties are occupied by businesses. Other properties in this area do not have a rental price, but rather have a high-ranged price of millions, in comparison to the rental price of other properties in upper Manhattan.
+
+For most of these properties, their rental price dropped in 2021 in comparison to their price in 2020. Notably, the 10 biggest drops in the rental prices are in lower Manhattan. This could be because the demand for these properties in 2021 decreased, therefore decreasing their rental price.
