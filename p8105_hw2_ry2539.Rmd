@@ -198,7 +198,7 @@ In total, we have 1,188 observations from Mr. Trash Wheel, Professor Trash Wheel
 
 For example, in the July of 2023, Gwynnda Trash Wheel has collected a total of 20.02 tons of trash from dumpster 155 to 160. Meanwhile, in the month of september of 2023, Professor Trash Wheel collected a total of 4.14 tons of trash from 2 dumpsters. As a subset of this data, these two dumptsers collected 25 cubic yards of said trash. 
 
-Other variables like sports balls and homes powered are also included in the dataset. For Mr. Trash Wheel, across all dumpsters from May 2014 to July 2025, a total of 2283.84 tons of trash was collected and about 30,020 homes were powered.
+Other variables like sports balls and homes powered are also included in the dataset. For Mr. Trash Wheel, across all dumpsters from May 2014 to July 2025, a total of `r sum(merged_data_trash_wheel_final$"Weight (tons)"[708:839])` tons of trash was collected and about 30,020 homes were powered. Meanwhile, for Gwynnda in the June of 2022, the total number of cigarette butts collected was `r sum(merged_data_trash_wheel_final$"Cigarette Butts"[914:926])`.
 
 # Problem 3
 
